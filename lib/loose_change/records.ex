@@ -1,9 +1,9 @@
-defmodule Records do
+defmodule LooseChange.Records do
   @moduledoc """
   This module provides functionality for performing CRUD operations on records.
   """
 
-  def list(%LooseChange{} = client, collection, opts) do
+  def list(%LooseChange{} = client, collection, opts \\ []) do
     opts =
       Keyword.validate!(
         opts,
