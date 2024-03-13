@@ -4,17 +4,12 @@ defmodule LooseChange do
   passed to most functions throughout this package.
   """
 
-  defstruct [:conn, base_path: ""]
+  defstruct [:req]
 
   @doc """
   Initialize a new client.
   """
   def new(base_url) do
-    with {:ok, base_url} <- URI.new(base_url),
-         {:ok, conn} <- Mint.HTTP.connect(base_url.scheme, base_url.host, base_url.port) do
-      {:ok, %__MODULE__{conn: conn, base_path: base_url.path}}
-    else
-      {:error, err} -> {:error, err}
-    end
+    %__MODULE__{req: Req.new(base_url: base_url)}
   end
 end

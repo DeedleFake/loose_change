@@ -21,7 +21,7 @@ defmodule LooseChange.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:mint, "~> 1.5"}
+      {:req, "~> 0.4.12"}
     ]
   end
 end
