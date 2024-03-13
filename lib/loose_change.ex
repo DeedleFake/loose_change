@@ -1,4 +1,4 @@
-defmodule Pocketbase do
+defmodule LooseChange do
   @moduledoc """
   This struct represents client information for PocketBase. It is
   passed to most functions throughout this package.

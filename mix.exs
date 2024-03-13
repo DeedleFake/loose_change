@@ -1,9 +1,9 @@
-defmodule Pocketbase.MixProject do
+defmodule LooseChange.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :pocketbase,
+      app: :loose_change,
       version: "0.1.0",
       elixir: "~> 1.16",
       start_permanent: Mix.env() == :prod,
