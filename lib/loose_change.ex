@@ -15,4 +15,9 @@ defmodule LooseChange do
   def new(base_url) do
     %__MODULE__{req: Req.new(base_url: base_url)}
   end
+
+  @spec with_auth(t(), Req.Response.t()) :: t()
+  def with_auth(%__MODULE__{req: req}, %Req.Response{body: %{"token" => token}}) do
+    %__MODULE__{req: req |> Req.merge(headers: %{"authentication" => token})}
+  end
 end

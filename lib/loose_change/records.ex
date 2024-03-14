@@ -32,20 +32,16 @@ defmodule LooseChange.Records do
   @spec auth_with_password(LooseChange.t(), collection_id(), String.t(), String.t(), keyword()) ::
           response()
   def auth_with_password(%LooseChange{} = client, collection, identity, password, opts \\ []) do
-    opts = Keyword.validate!(opts, [:expand, :fields, :into])
-
-    {opts, query} = Keyword.split(opts, [:into])
+    query = Keyword.validate!(opts, [:expand, :fields])
     query = query |> normalize_list(:expand)
     query = query |> normalize_list(:fields)
 
     client.req
     |> Req.post(
-      Keyword.merge(opts,
-        url: "/api/collections/:collection/auth-with-password",
-        path_params: [collection: collection],
-        body: [identity: identity, password: password],
-        params: query
-      )
+      url: "/api/collections/:collection/auth-with-password",
+      path_params: [collection: collection],
+      body: [identity: identity, password: password],
+      params: query
     )
   end
 
