@@ -3,6 +3,10 @@ defmodule LooseChange.Records do
   This module provides functionality for performing CRUD operations on records.
   """
 
+  @type record_id() :: String.t()
+
+  @spec list(LooseChange.t(), record_id(), keyword()) ::
+          {:ok, Req.Response.t()} | {:error, Exception.t()}
   def list(%LooseChange{} = client, collection, opts \\ []) do
     opts =
       Keyword.validate!(
@@ -24,6 +28,7 @@ defmodule LooseChange.Records do
     )
   end
 
+  @spec normalize_sort(keyword()) :: keyword()
   defp normalize_sort(opts) do
     Keyword.replace_lazy(opts, :sort, fn
       sort when is_list(sort) ->
@@ -40,6 +45,7 @@ defmodule LooseChange.Records do
     end)
   end
 
+  @spec normalize_list(keyword(), atom()) :: keyword()
   defp normalize_list(opts, name) do
     Keyword.replace_lazy(opts, name, fn
       opt when is_list(opt) -> opt |> Enum.join(",")

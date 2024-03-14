@@ -6,6 +6,9 @@ defmodule LooseChange do
 
   defstruct [:req]
 
+  @opaque t() :: %__MODULE__{}
+
+  @spec new(Req.url()) :: t()
   @doc """
   Initialize a new client.
   """
