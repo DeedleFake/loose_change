@@ -3,28 +3,49 @@ defmodule LooseChange.Records do
   This module provides functionality for performing CRUD operations on records.
   """
 
-  @type record_id() :: String.t()
+  @type collection_id() :: String.t()
+  @type response() :: {:ok, Req.Response.t()} | {:error, Exception.t()}
 
-  @spec list(LooseChange.t(), record_id(), keyword()) ::
-          {:ok, Req.Response.t()} | {:error, Exception.t()}
+  @spec list(LooseChange.t(), collection_id(), keyword()) :: response()
   def list(%LooseChange{} = client, collection, opts \\ []) do
     opts =
       Keyword.validate!(
         opts,
-        [:page, :per_page, :sort, :filter, :expand, :fields, :skip_total, into: nil]
+        [:page, :per_page, :sort, :filter, :expand, :fields, :skip_total, :into]
       )
 
-    {into, opts} = opts |> Keyword.pop(:into)
-    opts = opts |> normalize_sort()
-    opts = opts |> normalize_list(:expand)
-    opts = opts |> normalize_list(:fields)
+    {opts, query} = Keyword.split(opts, [:into])
+    query = query |> normalize_sort()
+    query = query |> normalize_list(:expand)
+    query = query |> normalize_list(:fields)
 
     client.req
     |> Req.get(
-      url: "/api/collections/:collection/records",
-      path_params: [collection: collection],
-      params: opts,
-      into: into
+      Keyword.merge(opts,
+        url: "/api/collections/:collection/records",
+        path_params: [collection: collection],
+        params: query
+      )
+    )
+  end
+
+  @spec auth_with_password(LooseChange.t(), collection_id(), String.t(), String.t(), keyword()) ::
+          response()
+  def auth_with_password(%LooseChange{} = client, collection, identity, password, opts \\ []) do
+    opts = Keyword.validate!(opts, [:expand, :fields, :into])
+
+    {opts, query} = Keyword.split(opts, [:into])
+    query = query |> normalize_list(:expand)
+    query = query |> normalize_list(:fields)
+
+    client.req
+    |> Req.post(
+      Keyword.merge(opts,
+        url: "/api/collections/:collection/auth-with-password",
+        path_params: [collection: collection],
+        body: [identity: identity, password: password],
+        params: query
+      )
     )
   end
 
