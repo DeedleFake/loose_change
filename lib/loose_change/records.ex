@@ -36,13 +36,19 @@ defmodule LooseChange.Records do
     query = query |> normalize_list(:expand)
     query = query |> normalize_list(:fields)
 
-    client.req
-    |> Req.post(
-      url: "/api/collections/:collection/auth-with-password",
-      path_params: [collection: collection],
-      body: [identity: identity, password: password],
-      params: query
-    )
+    with {:ok, body} <- %{identity: identity, password: password} |> Jason.encode(),
+         {:ok, rsp} <-
+           client.req
+           |> Req.post(
+             url: "/api/collections/:collection/auth-with-password",
+             path_params: [collection: collection],
+             body: body,
+             params: query
+           ) do
+      {:ok, rsp}
+    else
+      {:error, err} -> {:error, err}
+    end
   end
 
   @spec normalize_sort(keyword()) :: keyword()
