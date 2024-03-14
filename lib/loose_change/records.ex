@@ -19,14 +19,17 @@ defmodule LooseChange.Records do
     query = query |> normalize_list(:expand)
     query = query |> normalize_list(:fields)
 
-    client.req
-    |> Req.get(
-      Keyword.merge(opts,
-        url: "/api/collections/:collection/records",
-        path_params: [collection: collection],
-        params: query
-      )
-    )
+    case client.req
+         |> Req.get(
+           Keyword.merge(opts,
+             url: "/api/collections/:collection/records",
+             path_params: [collection: collection],
+             params: query
+           )
+         ) do
+      {:ok, rsp} -> normalize_response(rsp)
+      {:error, err} -> {:error, err}
+    end
   end
 
   @spec auth_with_password(LooseChange.t(), collection_id(), String.t(), String.t(), keyword()) ::
@@ -45,7 +48,7 @@ defmodule LooseChange.Records do
              body: body,
              params: query
            ) do
-      {:ok, rsp}
+      normalize_response(rsp)
     else
       {:error, err} -> {:error, err}
     end
@@ -75,4 +78,16 @@ defmodule LooseChange.Records do
       opt -> opt
     end)
   end
+
+  @spec normalize_response(Req.Response.t()) :: {:error, LooseChange.ServerError.t()}
+  defp normalize_response(%Req.Response{
+         status: status,
+         body: %{"data" => data, "message" => message}
+       })
+       when status >= 400 do
+    {:error, %LooseChange.ServerError{code: status, data: data, message: message}}
+  end
+
+  @spec normalize_response(Req.Response.t()) :: {:ok, Req.Response.t()}
+  defp normalize_response(%Req.Response{} = rsp), do: {:ok, rsp}
 end
