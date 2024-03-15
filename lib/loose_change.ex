@@ -13,7 +13,13 @@ defmodule LooseChange do
   Initialize a new client.
   """
   def new(base_url) do
-    %__MODULE__{req: Req.new(base_url: base_url)}
+    %__MODULE__{
+      req:
+        Req.new(
+          base_url: base_url,
+          headers: %{"content-type" => "application/json"}
+        )
+    }
   end
 
   @spec with_auth(t(), Req.Response.t()) :: t()
